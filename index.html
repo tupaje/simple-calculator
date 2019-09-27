@@ -1,0 +1,164 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+          font-size: 1em;
+    }
+    .row {
+      display: flex;
+      justify-content: center;
+    }
+    #display {
+      height: 32px;
+      max-width: 225px;
+      width: 100%;
+      text-align: right;
+      font-size: 1.5em;
+    }
+    .empty-space, [type="button"] {
+      margin: 0px 0.3em;
+      height: 2em;
+      width: 2em;
+      border-radius: 0.2em;
+      font-size: 1.5em;
+    }
+    .row-buttons {
+      padding: 1em;
+      display: flex;
+      justify-content: center;
+    }
+    #equation {
+      min-height: 1.2em;
+      font-size: 1.2em;
+    }
+  </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-143236351-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-143236351-1');
+
+    const CONSTANTS = {
+      CLEAR: 'CLEAR',
+      EQUALS: 'EQUALS',
+      PLUS: 'PLUS',
+      MINUS: 'MINUS',
+      TIMES: 'TIMES',
+      DIVIDE: 'DIVIDE',
+      UNDO: 'UNDO',
+      POINT: '.'
+    };
+  </script>
+</head>
+<body>
+  <div class="calculator">
+    <div class="row">
+    <span id="equation"></span>
+    </div>
+    <div class="row">
+    <input type="text" readonly aria-label="Display" id="display" />
+    </div>
+    <div class="row-buttons">
+    <span class="empty-space"></span>
+    <span class="empty-space"></span>
+    <input type="button" value="C" onclick="clickHandler(CONSTANTS.CLEAR)">
+    <input type="button" value="&divide;" onclick="clickHandler(CONSTANTS.DIVIDE)">
+    </div>
+    <div class="row-buttons">
+    <input type="button" value="7" onclick="clickHandler(7)">
+    <input type="button" value="8" onclick="clickHandler(8)">
+    <input type="button" value="9" onclick="clickHandler(9)">
+    <input type="button" value="&times;" onclick="clickHandler(CONSTANTS.TIMES)">
+    </div>
+    <div class="row-buttons">
+    <input type="button" value="4" onclick="clickHandler(4)">
+    <input type="button" value="5" onclick="clickHandler(5)">
+    <input type="button" value="6" onclick="clickHandler(6)">
+    <input type="button" value="&minus;" onclick="clickHandler(CONSTANTS.MINUS)">
+    </div>
+    <div class="row-buttons">
+    <input type="button" value="1" onclick="clickHandler(1)">
+    <input type="button" value="2" onclick="clickHandler(2)">
+    <input type="button" value="3" onclick="clickHandler(3)">
+    <input type="button" value="+" onclick="clickHandler(CONSTANTS.PLUS)">
+    </div>
+    <div class="row-buttons">
+    <span class="empty-space"></span>
+    <input type="button" value="0" onclick="clickHandler(0)">
+    <input type="button" value="." onclick="clickHandler(CONSTANTS.POINT)">
+    <input type="button" value="=" onclick="clickHandler(CONSTANTS.EQUALS)">
+    </div>
+  </div>
+<script>
+function clickHandler(value) {
+  const display = document.querySelector('#display'), equation = document.querySelector('#equation');
+  if(!isNaN(equation.textContent.slice(-1))) equation.textContent = '';
+  let textContent = display.value || equation.textContent.length <= 1? equation.textContent: equation.textContent.substring(0, equation.textContent.lastIndexOf(' '));
+  switch(value) {
+    case CONSTANTS.CLEAR:
+      display.value = equation.textContent = '';   
+    break;
+    case CONSTANTS.EQUALS:
+        equation.textContent = `${textContent} ${display.value}`;
+        display.value = Function(`"use strict";return (${equation.textContent})`)();
+      break;
+    case CONSTANTS.PLUS:
+      equation.textContent = `${textContent} ${display.value} +`;
+      display.value = '';
+    break;
+    case CONSTANTS.MINUS:
+      equation.textContent = `${textContent} ${display.value} -`;
+      display.value = '';
+    break;
+    case CONSTANTS.TIMES:
+      equation.textContent = `${textContent} ${display.value} *`;
+      display.value = '';
+    break;
+    case CONSTANTS.DIVIDE:
+      equation.textContent = `${textContent} ${display.value} /`;
+      display.value = '';
+    break;
+    case CONSTANTS.UNDO:
+      if(display.value) display.value = display.value.slice(0, -1);
+      else {
+        if(equation.textContent.length > 1) {
+          const index = textContent.lastIndexOf(' ');
+          display.value = textContent.substring(index).trim();
+          equation.textContent = textContent.substring(0, index);
+        } 
+        else {
+          display.value = equation.textContent
+          equation.textContent = '';
+        }
+      }
+    break;
+    default:
+      display.value += '' + value;
+  }
+};
+document.querySelector('#display').addEventListener('keyup', function (event) {
+    if (event.defaultPrevented) return;
+    const key = event.key || event.keyCode;
+    switch(key) {
+      case '+': clickHandler(CONSTANTS.PLUS); break;
+      case '-': clickHandler(CONSTANTS.MINUS); break;
+      case '*': clickHandler(CONSTANTS.TIMES); break;
+      case '/': clickHandler(CONSTANTS.DIVIDE); break;
+      case '.': clickHandler(CONSTANTS.POINT); break;
+      case 'Enter':
+      case '=': clickHandler(CONSTANTS.EQUALS); break;
+      case 'c': clickHandler(CONSTANTS.CLEAR); break;
+      case 'Backspace': clickHandler(CONSTANTS.UNDO); break;
+      default:
+        if (!isNaN(key) && key !== ' ') clickHandler(key);
+    }
+});
+</script>
+</body>
+</html>
